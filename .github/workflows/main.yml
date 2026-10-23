@@ -1,0 +1,91 @@
+package am.vanadzor.taxipark;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.content.Intent;
+import android.net.Uri;
+import android.graphics.Color;
+import android.view.Gravity;
+import android.widget.*;
+import android.view.ViewGroup;
+
+public class MainActivity extends Activity {
+
+    EditText from, to, name, phone;
+    LinearLayout layout;
+
+    @Override
+    public void onCreate(Bundle b) {
+        super.onCreate(b);
+
+        layout = new LinearLayout(this);
+        layout.setOrientation(1);
+        layout.setPadding(30, 30, 30, 30);
+        layout.setBackgroundColor(Color.WHITE);
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(layout);
+        setContentView(scroll);
+
+        TextView title = new TextView(this);
+        title.setText("🚕 VANADZOR TAXI PARK");
+        title.setTextSize(25);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.BLACK);
+        layout.addView(title);
+
+        name = field("Ուղևորի անունը");
+        phone = field("Հեռախոսահամար");
+        from = field("Մեկնելու հասցեն");
+        to = field("Գնալու հասցեն");
+
+        Button order = new Button(this);
+        order.setText("ԳՐԱՆՑԵԼ ՊԱՏՎԵՐԸ");
+        layout.addView(order);
+
+        Button call = new Button(this);
+        call.setText("ԶԱՆԳԵԼ ԴԻՍՊԵՏՉԵՐԻՆ");
+        layout.addView(call);
+
+        order.setOnClickListener(v -> {
+            if (from.getText().toString().trim().isEmpty()
+                    || to.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this,
+                        "Լրացրու հասցեները",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String message =
+                    "ՆՈՐ ՏԱՔՍԻ ՊԱՏՎԵՐ\n" +
+                    "Անուն՝ " + name.getText() + "\n" +
+                    "Հեռախոս՝ " + phone.getText() + "\n" +
+                    "Մեկնում՝ " + from.getText() + "\n" +
+                    "Գնալու վայր՝ " + to.getText();
+
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType("text/plain");
+            send.putExtra(Intent.EXTRA_TEXT, message);
+
+            startActivity(Intent.createChooser(
+                    send, "Ուղարկել պատվերը"));
+        });
+
+        call.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    Intent.ACTION_DIAL,
+                    Uri.parse("tel:055747573"));
+            startActivity(intent);
+        });
+    }
+
+    EditText field(String hint) {
+        EditText e = new EditText(this);
+        e.setHint(hint);
+        e.setTextSize(18);
+        layout.addView(e, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        return e;
+    }
+}
